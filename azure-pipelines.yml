@@ -23,3 +23,8 @@ steps:
     projectJsonPath: 'project.json'
     orchestratorConnection: 'Uipath'
     outputPath: '$(Build.ArtifactStagingDirectory)\Output'
+- task: UiPathDeploy@4
+  inputs:
+    orchestratorConnection: 'Uipath'
+    createProcess: false
+    folderName: 'VariantMatrix'
