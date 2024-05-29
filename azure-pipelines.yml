@@ -26,5 +26,5 @@ steps:
 - task: UiPathDeploy@4
   inputs:
     orchestratorConnection: 'Uipath'
-    createProcess: false
+    packagesPath: '$(Build.ArtifactStagingDirectory)\Output'
     folderName: 'VariantMatrix'
