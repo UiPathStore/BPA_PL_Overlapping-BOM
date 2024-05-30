@@ -1,8 +1,3 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
-
 trigger:
 - main
 
@@ -17,14 +12,30 @@ steps:
     echo Add other tasks to build, test, and deploy your project.
     echo See https://aka.ms/yaml
   displayName: 'Run a multi-line script'
-- task: UiPathPack@4
+
+- task: PowerShell@2
   inputs:
-    versionType: 'AutoVersion'
-    projectJsonPath: 'project.json'
-    orchestratorConnection: 'Uipath'
-    outputPath: '$(Build.ArtifactStagingDirectory)\Output'
-- task: UiPathDeploy@4
-  inputs:
-    orchestratorConnection: 'Uipath'
-    packagesPath: '$(Build.ArtifactStagingDirectory)\Output'
-    folderName: 'VariantMatrix'
+    targetType: 'inline'
+    script: |
+      # Define the test case folder names
+      $testCaseFolders = @("BPA_Column_Operation_01", "BPA_Column_Operation_02", "BPA_Column_Operation_03", "BPA_Column_Operation_06")
+      
+      # Loop through each test case folder
+      foreach ($testCaseFolder in $testCaseFolders) {
+        Write-Host "Processing test case: $testCaseFolder"
+        
+        # Build and publish the test case
+        Write-Host "Building and publishing test case: $testCaseFolder"
+        UiPathPack@4
+          inputs:
+            versionType: 'AutoVersion'
+            projectJsonPath: "$(System.DefaultWorkingDirectory)/$testCaseFolder/project.json"
+            orchestratorConnection: 'Uipath'
+            outputPath: '$(Build.ArtifactStagingDirectory)/Output/$testCaseFolder'
+        
+        UiPathDeploy@4
+          inputs:
+            orchestratorConnection: 'Uipath'
+            packagesPath: '$(Build.ArtifactStagingDirectory)/Output/$testCaseFolder'
+            folderName: $testCaseFolder
+      }
